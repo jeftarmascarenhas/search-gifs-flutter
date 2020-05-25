@@ -1,16 +1,14 @@
-# search_gifs
+# Search Gifs
 
-A new Flutter project.
+This project I used package share, transparent_image and http
 
-## Getting Started
+## Run project
 
-This project is a starting point for a Flutter application.
+`flutter pub get` 
 
-A few resources to get you started if this is your first Flutter project:
+or your IDE click get packages using plugin of IDE/Editor
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Open Simulator or device an after
+Ex. Macos `open -a Simulator` this command open Iphone Simulator.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+`flutter run`
