@@ -5,6 +5,8 @@ import "dart:async";
 import "dart:convert";
 
 import 'package:search_gifs/ui/git_detail_page.dart';
+import 'package:share/share.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -128,8 +130,9 @@ class _HomePageState extends State<HomePage> {
       itemBuilder: (context, index) {
         if (_search == null || index < _data.length) {
           return GestureDetector(
-            child: Image.network(
-              _imageUrl(index),
+            child: FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage,
+              image: _imageUrl(index),
               height: 300.0,
               fit: BoxFit.cover,
             ),
@@ -138,6 +141,9 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => GifDetailsPage(_data[index])));
+            },
+            onLongPress: () {
+              Share.share(_imageUrl(index));
             },
           );
         }
