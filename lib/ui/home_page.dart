@@ -4,6 +4,8 @@ import "package:http/http.dart" as http;
 import "dart:async";
 import "dart:convert";
 
+import 'package:search_gifs/ui/git_detail_page.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -12,6 +14,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _search;
   int _offset = 0;
+
+  TextEditingController searcController = TextEditingController();
 
   final _logoUrl =
       'https://developers.giphy.com/static/img/dev-logo-lg.7404c00322a8.gif';
@@ -23,7 +27,7 @@ class _HomePageState extends State<HomePage> {
           'https://api.giphy.com/v1/gifs/trending?api_key=3zcPgaXURAjornwV8lplsPYsyo8sGWMu&limit=20&rating=G');
     } else {
       response = await http.get(
-          'https://api.giphy.com/v1/gifs/search?api_key=3zcPgaXURAjornwV8lplsPYsyo8sGWMu&q=$_search&limit=20&offset=$_offset&rating=G&lang=en');
+          'https://api.giphy.com/v1/gifs/search?api_key=3zcPgaXURAjornwV8lplsPYsyo8sGWMu&q=$_search&limit=19&offset=$_offset&rating=G&lang=en');
     }
     return json.decode(response.body);
   }
@@ -51,11 +55,19 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: EdgeInsets.all(10.0),
             child: TextField(
+              controller: searcController,
               decoration: InputDecoration(
                 labelText: 'Search',
                 labelStyle: TextStyle(color: Colors.white),
                 border: OutlineInputBorder(),
               ),
+              onSubmitted: (text) {
+                setState(() {
+                  _search = text;
+                  _offset = 0;
+                  searcController.text = '';
+                });
+              },
               style: TextStyle(color: Colors.white, fontSize: 18.0),
               textAlign: TextAlign.center,
             ),
@@ -91,9 +103,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  int _getCount(List data) {
+    if (_search == null) {
+      return data.length;
+    } else {
+      return data.length + 1;
+    }
+  }
+
   Widget _createGifsTable(BuildContext context, AsyncSnapshot snapshot) {
+    final _data = snapshot.data['data'];
     String _imageUrl(imageIndex) {
-      return snapshot.data['data'][imageIndex]['images']['fixed_height']['url'];
+      return _data[imageIndex]['images']['fixed_height']['url'];
     }
 
     return GridView.builder(
@@ -103,13 +124,47 @@ class _HomePageState extends State<HomePage> {
         crossAxisSpacing: 10.0,
         mainAxisSpacing: 10.0,
       ),
-      itemCount: snapshot.data['data'].length,
+      itemCount: _getCount(_data),
       itemBuilder: (context, index) {
-        return GestureDetector(
-          child: Image.network(
-            _imageUrl(index),
-            height: 300.0,
-            fit: BoxFit.cover,
+        if (_search == null || index < _data.length) {
+          return GestureDetector(
+            child: Image.network(
+              _imageUrl(index),
+              height: 300.0,
+              fit: BoxFit.cover,
+            ),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => GifDetailsPage(_data[index])));
+            },
+          );
+        }
+        return Container(
+          child: GestureDetector(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 70.0,
+                ),
+                Text(
+                  'Load More',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22.0,
+                  ),
+                )
+              ],
+            ),
+            onTap: () {
+              setState(() {
+                _offset += 19;
+              });
+            },
           ),
         );
       },
